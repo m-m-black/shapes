@@ -1,6 +1,6 @@
 let shapes;
-let currentNode;
 let shapeOpen;
+let currentNode;
 let currentShape;
 
 const DIST_THRESH = 20;
@@ -13,27 +13,31 @@ function setup() {
 
 function draw() {
 	background(0);
-	stroke(200);
 	noFill();
+	stroke(200);
 	shapes.forEach(shape => {
 		shape.display();
 	})
 }
 
 function mousePressed() {
+	if (currentShape) {
+		currentShape.pending = true;
+	}
 	if (shapeOpen) {
 		// Append node to current shape
 		let node = new Node(mouseX, mouseY);
 		currentNode = node;
-		currentShape.add(node);
+		currentShape.add(currentNode);
 	} else {
 		// Create new shape with new node
 		let node = new Node(mouseX, mouseY);
 		currentNode = node;
 		let shape = new Shape();
 		currentShape = shape;
-		shape.add(node);
-		shapes.push(shape);
+		currentShape.add(currentNode);
+		currentShape.spot = currentNode;
+		shapes.push(currentShape);
 		shapeOpen = true;
 	}
 	return false; // Prevent default behaviour of mousePressed()
@@ -70,8 +74,7 @@ function mouseReleased() {
 			break;
 		}
 	}
-	console.log(currentShape.nodes.length);
-	console.log(currentShape.closed);
+	currentShape.pending = false;
 	return false; // Prevent default behaviour of mouseReleased()
 }
 
@@ -100,6 +103,10 @@ class Shape {
 	constructor(node) {
 		this.nodes = [];
 		this.closed = false;
+		this.pending = false; // Is there a node waiting to be drawn?
+		// If so, play melody from node 0 to node length-2
+		// Otherwise, play melody from node 0 to node length-1
+		this.spot = null;
 	}
 
 	add(node) {
@@ -107,18 +114,20 @@ class Shape {
 	}
 
 	display() {
-		let n = this.nodes;
-		for (let i = 0; i < n.length; i++) {
-			// Display the node
-			n[i].display();
-			// Draw lines between each node
-			if (i < n.length - 1) {
-				line(n[i].x, n[i].y, n[i+1].x, n[i+1].y);
+		if (this.nodes.length > 0) {
+			let n = this.nodes;
+			for (let i = 0; i < n.length; i++) {
+				// Display the node
+				n[i].display();
+				// Draw lines between each node
+				if (i < n.length - 1) {
+					line(n[i].x, n[i].y, n[i+1].x, n[i+1].y);
+				}
 			}
-		}
-		if (this.closed) {
-			// Draw a line from the last node to the first node
-			line(n[n.length-1].x, n[n.length-1].y, n[0].x, n[0].y);
+			if (this.closed) {
+				// Draw a line from the last node to the first node
+				line(n[n.length-1].x, n[n.length-1].y, n[0].x, n[0].y);
+			}
 		}
 	}
 
