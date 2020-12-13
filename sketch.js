@@ -36,7 +36,9 @@ function mousePressed() {
 		let shape = new Shape();
 		currentShape = shape;
 		currentShape.add(currentNode);
-		currentShape.spot = currentNode;
+		currentShape.mover = currentNode.vector.copy();
+		currentShape.target = currentNode.vector;
+		currentShape.targetIndex = 0;
 		shapes.push(currentShape);
 		shapeOpen = true;
 	}
@@ -83,6 +85,7 @@ class Node {
 		this.x = x;
 		this.y = y;
 		this.diameter = 10;
+		this.vector = createVector(this.x, this.y);
 	}
 
 	display() {
@@ -106,7 +109,12 @@ class Shape {
 		this.pending = false; // Is there a node waiting to be drawn?
 		// If so, play melody from node 0 to node length-2
 		// Otherwise, play melody from node 0 to node length-1
-		this.spot = null;
+		this.currentSpot = 0;
+		this.looping = false;
+		this.mover = null; // The vector that will move around the shape
+		this.target = null; // The vector that will be updated around the shape
+		this.targetIndex = null; // Index of the target vector
+		this.up = true; // For back and forth motion, starting direction
 	}
 
 	add(node) {
@@ -114,6 +122,15 @@ class Shape {
 	}
 
 	display() {
+		this.displayNodes();
+		if (this.nodes.length > 1) {
+			this.displaySpot();
+		}
+	}
+
+	displayNodes() {
+		stroke(200);
+		// Draw each node and lines between them
 		if (this.nodes.length > 0) {
 			let n = this.nodes;
 			for (let i = 0; i < n.length; i++) {
@@ -131,7 +148,71 @@ class Shape {
 		}
 	}
 
+	displaySpot() {
+		// Use l to determine how many nodes we traverse
+		let n;
+		if (this.pending) {
+			n = this.nodes.length - 1;
+		} else {
+			n = this.nodes.length;
+		}
+		if (this.closed) {
+			// Display in a loop
+			this.displayLoop(n);
+		} else {
+			// Display back and forth
+			this.displayBackAndForth(n);
+		}
+	}
+
+	displayLoop(n) {
+		this.mover = p5.Vector.lerp(this.mover, this.target, 0.1);
+		if (p5.Vector.dist(this.mover, this.target) < 1) {
+			this.updateTargetLooping(n);
+		}
+		stroke(255, 0, 0);
+		ellipse(this.mover.x, this.mover.y, 15, 15);
+	}
+
+	displayBackAndForth(n) {
+		this.mover = p5.Vector.lerp(this.mover, this.target, 0.1);
+		if (p5.Vector.dist(this.mover, this.target) < 1) {
+			this.updateTargetBackAndForth(n);
+		}
+		stroke(255, 0, 0);
+		ellipse(this.mover.x, this.mover.y, 15, 15);
+	}
+
+	updateTargetLooping() {
+		if (this.targetIndex < this.nodes.length - 1) {
+			this.targetIndex++;
+		} else {
+			this.targetIndex = 0;
+		}
+		this.target = this.nodes[this.targetIndex].vector;
+	}
+
+	updateTargetBackAndForth(n) {
+		if (this.up) {
+			if (this.targetIndex < this.nodes.length - 1) {
+				this.targetIndex++;
+			} else {
+				this.targetIndex--;
+				this.up = false;
+			}
+		} else {
+			if (this.targetIndex > 0) {
+				this.targetIndex--;
+			} else {
+				this.targetIndex++;
+				this.up = true;
+			}
+		}
+		this.target = this.nodes[this.targetIndex].vector;
+	}
+
 	close() {
 		this.closed = true;
+		this.looping = true;
 	}
 }
