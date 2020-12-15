@@ -5,6 +5,15 @@ class Node {
 		this.diameter = 10;
 		this.isAllowed = true;
 		this.isOrigin = false;
+		// The following fields to be initialised in init()
+		this.vector = null;
+		this.pitchAxis = null;
+		this.pitchAxisValue = null;
+		this.rawFreq = null;
+		this.freq = null;
+	}
+
+	init() {
 		this.vector = createVector(this.x, this.y);
 		this.pitchAxis = windowWidth > windowHeight ? windowWidth : windowHeight;
 		this.pitchAxisValue = windowWidth > windowHeight ? this.x : this.y;

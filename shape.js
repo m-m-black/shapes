@@ -3,6 +3,7 @@ class Shape {
 		this.nodes = [];
 		this.closed = false;
 		this.pending = false; // Is there a node waiting to be drawn?
+		// The following fields to be initialised in init()
 		this.currentSpot = null;
 		this.looping = null;
 		this.mover = null; // The vector that will move around the shape
