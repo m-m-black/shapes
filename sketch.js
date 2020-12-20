@@ -40,8 +40,6 @@ function mousePressed() {
 function mouseDragged() {
 	currentNode.x = mouseX;
 	currentNode.y = mouseY;
-	console.log("mouse: " + mouseX + ", " + mouseY);
-	console.log("node: " + currentNode.x + ", " + currentNode.y);
 	checkPosition();
 	return false; // Prevent default behaviour of mouseDragged()
 }

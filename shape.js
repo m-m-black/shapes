@@ -7,8 +7,10 @@ class Shape {
 		this.currentSpot = null;
 		this.looping = null;
 		this.mover = null; // The vector that will move around the shape
+		this.velocity = null;
 		this.target = null; // The vector that will be updated around the shape
 		this.targetIndex = null; // Index of the target vector
+		this.speed = null;
 		this.up = null; // For back and forth motion, starting direction
 		this.synth = null;
 	}
@@ -19,6 +21,8 @@ class Shape {
 		this.mover = currentNode.vector.copy();
 		this.target = currentNode.vector;
 		this.targetIndex = 0;
+		this.velocity = p5.Vector.sub(this.target, this.mover);
+		this.speed = 4;
 		this.up = true;
 		this.synth = new p5.MonoSynth();
 	}
@@ -55,52 +59,32 @@ class Shape {
 	}
 
 	displaySpot() {
-		// Use n to determine how many nodes we traverse
-		let n;
-		if (this.pending) {
-			n = this.nodes.length - 1;
-		} else {
-			n = this.nodes.length;
+		if (p5.Vector.dist(this.mover, this.target) < this.speed / 2) {
+			this.playNote();
+			this.updateTarget();
+			this.setVelocity();
 		}
-		this.mover = p5.Vector.lerp(this.mover, this.target, 0.2);
-		if (p5.Vector.dist(this.mover, this.target) < 1) {
-			this.synth.play(this.nodes[this.targetIndex].freq, 0.1, 0, 1);
-			if (this.closed) {
-				this.updateTargetLooping();
-			} else {
-				this.updateTargetBackAndForth(n);
-			}
-		}
+		this.mover.add(this.velocity);
 		stroke(255, 0, 0);
-		ellipse(this.mover.x, this.mover.y, 15, 15);
+		ellipse(this.mover.x, this.mover.y, 10, 10);
 	}
 
-	nextTargetLooping() {
-		let newIndex = this.targetIndex;
-		if (this.targetIndex < this.nodes.length - 1) {
-			newIndex++;
-		} else {
-			newIndex = 0;
-		}
-		return newIndex;
+	playNote() {
+		this.synth.play(this.nodes[this.targetIndex].freq, 0.1, 0, 0.1);
 	}
 
-	nextTargetBackAndForth() {
-		let newIndex = this.targetIndex;
-		if (this.up) {
-			if (this.targetIndex < this.nodes.length - 1) {
-				newIndex++;
-			} else {
-				newIndex--;
-			}
+	updateTarget() {
+		if (this.closed) {
+			this.updateTargetLooping();
 		} else {
-			if (this.targetIndex > 0) {
-				newIndex--;
-			} else {
-				newIndex++;
-			}
+			this.updateTargetBackAndForth();
 		}
-		return newIndex;
+	}
+
+	setVelocity() {
+		this.velocity = p5.Vector.sub(this.target, this.mover);
+		this.velocity.normalize();
+		this.velocity.mult(this.speed);
 	}
 
 	updateTargetLooping() {
@@ -112,7 +96,7 @@ class Shape {
 		this.target = this.nodes[this.targetIndex].vector;
 	}
 
-	updateTargetBackAndForth(n) {
+	updateTargetBackAndForth() {
 		if (this.up) {
 			if (this.targetIndex < this.nodes.length - 1) {
 				this.targetIndex++;
