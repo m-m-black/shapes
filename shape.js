@@ -21,10 +21,9 @@ class Shape {
 		this.mover = currentNode.vector.copy();
 		this.target = currentNode.vector;
 		this.targetIndex = 0;
-		this.velocity = p5.Vector.sub(this.target, this.mover);
 		this.speed = 4;
 		this.up = true;
-		this.synth = new p5.MonoSynth();
+		this.synth = new SimpleSynth("triangle");
 	}
 
 	add(node) {
@@ -70,7 +69,13 @@ class Shape {
 	}
 
 	playNote() {
-		this.synth.play(this.nodes[this.targetIndex].freq, 0.1, 0, 0.1);
+		let freq = this.nodes[this.targetIndex].freq;
+		/*
+			TO DO
+			Set note length based on vector length
+		*/
+		let length = 0.5;
+		this.synth.playNote(freqToMidi(freq), length);
 	}
 
 	updateTarget() {
