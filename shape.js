@@ -60,6 +60,7 @@ class Shape {
 	displaySpot() {
 		if (p5.Vector.dist(this.mover, this.target) < this.speed / 2) {
 			this.playNote();
+			this.resetPosition();
 			this.updateTarget();
 			this.setVelocity();
 		}
@@ -76,6 +77,10 @@ class Shape {
 		*/
 		let length = 0.5;
 		this.synth.playNote(freqToMidi(freq), length);
+	}
+
+	resetPosition() {
+		this.mover.set(this.target.x, this.target.y);
 	}
 
 	updateTarget() {
