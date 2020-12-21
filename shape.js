@@ -71,12 +71,10 @@ class Shape {
 
 	playNote() {
 		let freq = this.nodes[this.targetIndex].freq;
-		/*
-			TO DO
-			Set note length based on vector length
-		*/
-		let length = 0.5;
-		this.synth.playNote(freqToMidi(freq), length);
+		let dist = p5.Vector.dist(this.nodes[this.targetIndex].vector, this.nodes[this.nextIndex()].vector);
+		let speed = frameRate() * this.speed;
+		let time = dist / speed;
+		this.synth.playNote(freqToMidi(freq), time * 0.75);
 	}
 
 	resetPosition() {
@@ -89,6 +87,44 @@ class Shape {
 		} else {
 			this.updateTargetBackAndForth();
 		}
+	}
+
+	nextIndex() {
+		let nextIndex = this.targetIndex;
+		if (this.closed) {
+			nextIndex = this.nextIndexLooping();
+		} else {
+			nextIndex = this.nextIndexBackAndForth();
+		}
+		return nextIndex;
+	}
+
+	nextIndexLooping() {
+		let newIndex = this.targetIndex;
+		if (this.targetIndex < this.nodes.length - 1) {
+			newIndex++;
+		} else {
+			newIndex = 0;
+		}
+		return newIndex;
+	}
+
+	nextIndexBackAndForth() {
+		let newIndex = this.targetIndex;
+		if (this.up) {
+			if (this.targetIndex < this.nodes.length - 1) {
+				newIndex++;
+			} else {
+				newIndex--;
+			}
+		} else {
+			if (this.targetIndex > 0) {
+				newIndex--;
+			} else {
+				newIndex++;
+			}
+		}
+		return newIndex;
 	}
 
 	setVelocity() {
