@@ -23,7 +23,8 @@ class Shape {
 		this.targetIndex = 0;
 		this.speed = 4;
 		this.up = true;
-		this.synth = new SimpleSynth("triangle");
+		//this.synth = new SimpleSynth("triangle");
+		this.synth = new Synth();
 	}
 
 	add(node) {
@@ -74,7 +75,7 @@ class Shape {
 		let dist = p5.Vector.dist(this.nodes[this.targetIndex].vector, this.nodes[this.nextIndex()].vector);
 		let speed = frameRate() * this.speed;
 		let time = dist / speed;
-		this.synth.playNote(freqToMidi(freq), time * 0.75);
+		this.synth.playNote(freqToMidi(freq), time * 0.99);
 	}
 
 	resetPosition() {
