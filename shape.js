@@ -13,6 +13,7 @@ class Shape {
 		this.speed = null;
 		this.up = null; // For back and forth motion, starting direction
 		this.synth = null;
+		this.maxDist = null; // Maximum distance from mover to target
 	}
 
 	init() {
@@ -25,6 +26,7 @@ class Shape {
 		this.up = true;
 		//this.synth = new SimpleSynth("triangle");
 		this.synth = new Synth();
+		this.maxDist = 0;
 	}
 
 	add(node) {
@@ -59,15 +61,19 @@ class Shape {
 	}
 
 	displaySpot() {
-		if (p5.Vector.dist(this.mover, this.target) < this.speed / 2) {
+		let dist = p5.Vector.dist(this.mover, this.target);
+		if (dist < this.speed / 2) {
 			this.playNote();
 			this.resetPosition();
 			this.updateTarget();
 			this.setVelocity();
+			this.setMaxDist();
 		}
 		this.mover.add(this.velocity);
-		stroke(255, 0, 0);
-		ellipse(this.mover.x, this.mover.y, 10, 10);
+		// Map distance to target to opacity
+		let op = map(dist, 0, this.maxDist, 0, 255);
+		stroke(0, 255, 0, op);
+		ellipse(this.mover.x, this.mover.y, 15, 15);
 	}
 
 	playNote() {
@@ -88,6 +94,44 @@ class Shape {
 		} else {
 			this.updateTargetBackAndForth();
 		}
+	}
+
+	setVelocity() {
+		this.velocity = p5.Vector.sub(this.target, this.mover);
+		this.velocity.normalize();
+		this.velocity.mult(this.speed);
+	}
+
+	setMaxDist() {
+		this.maxDist = p5.Vector.dist(this.mover, this.target);
+	}
+
+	updateTargetLooping() {
+		if (this.targetIndex < this.nodes.length - 1) {
+			this.targetIndex++;
+		} else {
+			this.targetIndex = 0;
+		}
+		this.target = this.nodes[this.targetIndex].vector;
+	}
+
+	updateTargetBackAndForth() {
+		if (this.up) {
+			if (this.targetIndex < this.nodes.length - 1) {
+				this.targetIndex++;
+			} else {
+				this.targetIndex--;
+				this.up = false;
+			}
+		} else {
+			if (this.targetIndex > 0) {
+				this.targetIndex--;
+			} else {
+				this.targetIndex++;
+				this.up = true;
+			}
+		}
+		this.target = this.nodes[this.targetIndex].vector;
 	}
 
 	nextIndex() {
@@ -126,40 +170,6 @@ class Shape {
 			}
 		}
 		return newIndex;
-	}
-
-	setVelocity() {
-		this.velocity = p5.Vector.sub(this.target, this.mover);
-		this.velocity.normalize();
-		this.velocity.mult(this.speed);
-	}
-
-	updateTargetLooping() {
-		if (this.targetIndex < this.nodes.length - 1) {
-			this.targetIndex++;
-		} else {
-			this.targetIndex = 0;
-		}
-		this.target = this.nodes[this.targetIndex].vector;
-	}
-
-	updateTargetBackAndForth() {
-		if (this.up) {
-			if (this.targetIndex < this.nodes.length - 1) {
-				this.targetIndex++;
-			} else {
-				this.targetIndex--;
-				this.up = false;
-			}
-		} else {
-			if (this.targetIndex > 0) {
-				this.targetIndex--;
-			} else {
-				this.targetIndex++;
-				this.up = true;
-			}
-		}
-		this.target = this.nodes[this.targetIndex].vector;
 	}
 
 	close() {

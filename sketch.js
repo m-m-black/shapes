@@ -21,7 +21,9 @@ function draw() {
 	})
 	if (currentShape && currentShape.nodes.length > 0 && currentShape.pending) {
 		let n = currentShape.nodes.length;
+		stroke(255, 0, 0);
 		line(currentShape.nodes[n-1].x, currentShape.nodes[n-1].y, currentNode.x, currentNode.y);
+		stroke(200);
 		ellipse(currentNode.x, currentNode.y, 10, 10);
 	}
 }
