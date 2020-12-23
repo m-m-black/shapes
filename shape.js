@@ -72,8 +72,9 @@ class Shape {
 		this.mover.add(this.velocity);
 		// Map distance to target to opacity
 		let op = map(dist, 0, this.maxDist, 0, 255);
+		let size = map(dist, 0, this.maxDist, 0, 20);
 		stroke(0, 255, 0, op);
-		ellipse(this.mover.x, this.mover.y, 15, 15);
+		ellipse(this.mover.x, this.mover.y, size, size);
 	}
 
 	playNote() {
