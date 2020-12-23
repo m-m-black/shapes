@@ -5,11 +5,14 @@ let currentShape;
 let sessionStarted;
 
 const DIST_THRESH = 20;
-const C_MAJOR = [48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
+const SCALE = [36, 38, 40, 41, 43, 45, 47, 48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
+
+let grid;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	shapes = [];
+	grid = initGrid();
 	shapeOpen = false;
 	sessionStarted = false;
 }
@@ -19,6 +22,7 @@ function draw() {
 	noFill();
 	stroke(200);
 	if (sessionStarted) {
+		drawGrid();
 		shapes.forEach(shape => {
 			shape.display();
 		})
@@ -39,6 +43,19 @@ function draw() {
 	}
 }
 
+function drawGrid() {
+	grid.forEach(i => {
+		if (i > 0) {
+			stroke(50);
+			if (windowWidth > windowHeight) {
+				line(i, 0, i, height);
+			} else {
+				line(0, i, width, i);
+			}
+		}
+	})
+}
+
 function mousePressed() {
 	if (sessionStarted) {
 		let node = new Node(mouseX, mouseY);
@@ -55,7 +72,7 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-	if (sessionStarted) {
+	if (sessionStarted && currentNode) {
 		currentNode.x = mouseX;
 		currentNode.y = mouseY;
 		checkPosition();
@@ -64,7 +81,7 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
-	if (sessionStarted) {
+	if (sessionStarted && currentShape) {
 		checkPosition();
 		if (currentNode.isAllowed) {
 			currentNode.init();
@@ -100,14 +117,12 @@ function checkPosition() {
 	}
 }
 
-// Take raw frequency as input, return that frequency quantised to a scale degree
-function quantise(f) {
-	let freq = null;
-	for (let i = 0; i < C_MAJOR.length; i++) {
-		if (f < midiToFreq(C_MAJOR[i])) {
-			freq = midiToFreq(C_MAJOR[i]);
-			break;
-		}
+function initGrid() {
+	let array = [];
+	let axis = windowWidth > windowHeight ? windowWidth : windowHeight;
+	let stepSize = axis / SCALE.length;
+	for (let i = 0; i < axis; i += stepSize) {
+		array.push(i);
 	}
-	return freq;
+	return array;
 }

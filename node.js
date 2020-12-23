@@ -9,19 +9,23 @@ class Node {
 		this.vector = null;
 		this.pitchAxis = null;
 		this.pitchAxisValue = null;
-		this.rawFreq = null;
-		this.freq = null;
+		this.midi = null;
 	}
 
 	init() {
 		this.vector = createVector(this.x, this.y);
 		this.pitchAxis = windowWidth > windowHeight ? windowWidth : windowHeight;
 		this.pitchAxisValue = windowWidth > windowHeight ? this.x : this.y;
-		this.rawFreq = map(this.pitchAxisValue, 0, this.pitchAxis, 120, 530);
-		if (this.pitchAxis === windowHeight) {
-			this.rawFreq = abs(windowHeight - this.rawFreq);
+		for (let i = grid.length; i >= 0; i--) {
+			if (this.pitchAxisValue > grid[i]) {
+				if (this.pitchAxis === windowHeight) {
+					this.midi = SCALE[(SCALE.length - 1) - i];
+				} else {
+					this.midi = SCALE[i];
+				}
+				break;
+			}
 		}
-		this.freq = quantise(this.rawFreq);
 	}
 
 	display() {
