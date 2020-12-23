@@ -2,6 +2,7 @@ let shapes;
 let shapeOpen;
 let currentNode;
 let currentShape;
+let sessionStarted;
 
 const DIST_THRESH = 20;
 const C_MAJOR = [48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
@@ -10,58 +11,75 @@ function setup() {
 	createCanvas(windowWidth, windowHeight);
 	shapes = [];
 	shapeOpen = false;
+	sessionStarted = false;
 }
 
 function draw() {
 	background(0);
 	noFill();
 	stroke(200);
-	shapes.forEach(shape => {
-		shape.display();
-	})
-	if (currentShape && currentShape.nodes.length > 0 && currentShape.pending) {
-		let n = currentShape.nodes.length;
-		stroke(255, 0, 0);
-		line(currentShape.nodes[n-1].x, currentShape.nodes[n-1].y, currentNode.x, currentNode.y);
-		stroke(200);
-		ellipse(currentNode.x, currentNode.y, 10, 10);
+	if (sessionStarted) {
+		shapes.forEach(shape => {
+			shape.display();
+		})
+		if (currentShape && currentShape.nodes.length > 0 && currentShape.pending) {
+			let n = currentShape.nodes.length;
+			stroke(255, 0, 0);
+			line(currentShape.nodes[n-1].x, currentShape.nodes[n-1].y, currentNode.x, currentNode.y);
+			stroke(200);
+			ellipse(currentNode.x, currentNode.y, 10, 10);
+		}
+	} else {
+		// Display welcome text and instructions
+		fill(200);
+		textSize(width / 50);
+		textAlign(CENTER, CENTER);
+		textFont("Comfortaa");
+		text("Click anywhere to start...", width / 2, height / 2);
 	}
 }
 
 function mousePressed() {
-	let node = new Node(mouseX, mouseY);
-	currentNode = node;
-	if (!shapeOpen) {
-		let shape = new Shape();
-		currentShape = shape;
+	if (sessionStarted) {
+		let node = new Node(mouseX, mouseY);
+		currentNode = node;
+		if (!shapeOpen) {
+			let shape = new Shape();
+			currentShape = shape;
+		}
+		currentShape.pending = true;
+	} else {
+		sessionStarted = true;
 	}
-	currentShape.pending = true;
 	return false; // Prevent default behaviour of mousePressed()
 }
 
 function mouseDragged() {
-	currentNode.x = mouseX;
-	currentNode.y = mouseY;
-	checkPosition();
+	if (sessionStarted) {
+		currentNode.x = mouseX;
+		currentNode.y = mouseY;
+		checkPosition();
+	}
 	return false; // Prevent default behaviour of mouseDragged()
 }
 
 function mouseReleased() {
-	checkPosition();
-	if (currentNode.isAllowed) {
-		currentNode.init();
-		currentShape.add(currentNode);
-		if (!shapeOpen) {
-			currentShape.init();
-			shapes.push(currentShape);
-			shapeOpen = true;
-
+	if (sessionStarted) {
+		checkPosition();
+		if (currentNode.isAllowed) {
+			currentNode.init();
+			currentShape.add(currentNode);
+			if (!shapeOpen) {
+				currentShape.init();
+				shapes.push(currentShape);
+				shapeOpen = true;
+			}
+		} else if (currentNode.isOrigin) {
+			currentShape.close();
+			shapeOpen = false;
 		}
-	} else if (currentNode.isOrigin) {
-		currentShape.close();
-		shapeOpen = false;
+		currentShape.pending = false;
 	}
-	currentShape.pending = false;
 	return false; // Prevent default behaviour of mouseReleased()
 }
 
