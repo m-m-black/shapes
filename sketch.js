@@ -22,7 +22,9 @@ function draw() {
 	noFill();
 	stroke(200);
 	if (sessionStarted) {
+		strokeWeight(1);
 		drawGrid();
+		strokeWeight(2);
 		shapes.forEach(shape => {
 			shape.display();
 		})
@@ -46,7 +48,7 @@ function draw() {
 function drawGrid() {
 	grid.forEach(i => {
 		if (i > 0) {
-			stroke(50);
+			stroke(25);
 			if (windowWidth > windowHeight) {
 				line(i, 0, i, height);
 			} else {
