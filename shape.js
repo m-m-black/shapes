@@ -6,23 +6,23 @@ class Shape {
 		// The following fields to be initialised in init()
 		this.currentSpot = null;
 		this.looping = null;
-		this.mover = null; // The vector that will move around the shape
+		this.mover = null;
 		this.velocity = null;
-		this.target = null; // The vector that will be updated around the shape
-		this.targetIndex = null; // Index of the target vector
+		this.target = null;
+		this.targetIndex = null;
 		this.speed = null;
 		this.up = null; // For back and forth motion, starting direction
 		this.synth = null;
 		this.maxDist = null; // Maximum distance from mover to target
 	}
 
-	init() {
+	init(speed) {
 		this.currentSpot = 0;
 		this.looping = false;
 		this.mover = currentNode.vector.copy();
 		this.target = currentNode.vector;
 		this.targetIndex = 0;
-		this.speed = 4;
+		this.speed = speed;
 		this.up = true;
 		this.synth = new Synth();
 		this.maxDist = 0;
@@ -41,19 +41,15 @@ class Shape {
 
 	displayNodes() {
 		stroke(200);
-		// Draw each node and lines between them
 		if (this.nodes.length > 0) {
 			let n = this.nodes;
 			for (let i = 0; i < n.length; i++) {
-				// Display the node
 				n[i].display();
-				// Draw lines between each node
 				if (i < n.length - 1) {
 					line(n[i].x, n[i].y, n[i+1].x, n[i+1].y);
 				}
 			}
 			if (this.closed) {
-				// Draw a line from the last node to the first node
 				line(n[n.length-1].x, n[n.length-1].y, n[0].x, n[0].y);
 			}
 		}
@@ -69,7 +65,7 @@ class Shape {
 			this.setMaxDist();
 		}
 		this.mover.add(this.velocity);
-		// Map distance to target to opacity
+		// Map distance to target to opacity and ellipse size
 		let op = map(dist, 0, this.maxDist, 0, 255);
 		let size = map(dist, 0, this.maxDist, 0, 20);
 		stroke(0, 255, 0, op);
@@ -94,16 +90,6 @@ class Shape {
 		} else {
 			this.updateTargetBackAndForth();
 		}
-	}
-
-	setVelocity() {
-		this.velocity = p5.Vector.sub(this.target, this.mover);
-		this.velocity.normalize();
-		this.velocity.mult(this.speed);
-	}
-
-	setMaxDist() {
-		this.maxDist = p5.Vector.dist(this.mover, this.target);
 	}
 
 	updateTargetLooping() {
@@ -132,6 +118,16 @@ class Shape {
 			}
 		}
 		this.target = this.nodes[this.targetIndex].vector;
+	}
+
+	setVelocity() {
+		this.velocity = p5.Vector.sub(this.target, this.mover);
+		this.velocity.normalize();
+		this.velocity.mult(this.speed);
+	}
+
+	setMaxDist() {
+		this.maxDist = p5.Vector.dist(this.mover, this.target);
 	}
 
 	nextIndex() {

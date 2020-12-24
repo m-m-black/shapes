@@ -3,11 +3,12 @@ let shapeOpen;
 let currentNode;
 let currentShape;
 let sessionStarted;
+let grid;
+let pitchAxis;
 
 const DIST_THRESH = 20;
+const SPEED = 4;
 const SCALE = [36, 38, 40, 41, 43, 45, 47, 48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
-
-let grid;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
@@ -15,6 +16,7 @@ function setup() {
 	grid = initGrid();
 	shapeOpen = false;
 	sessionStarted = false;
+	pitchAxis = windowWidth > windowHeight ? windowWidth : windowHeight;
 }
 
 function draw() {
@@ -25,23 +27,9 @@ function draw() {
 		strokeWeight(1);
 		drawGrid();
 		strokeWeight(2);
-		shapes.forEach(shape => {
-			shape.display();
-		})
-		if (currentShape && currentShape.nodes.length > 0 && currentShape.pending) {
-			let n = currentShape.nodes.length;
-			stroke(255, 0, 0);
-			line(currentShape.nodes[n-1].x, currentShape.nodes[n-1].y, currentNode.x, currentNode.y);
-			stroke(200);
-			ellipse(currentNode.x, currentNode.y, 10, 10);
-		}
+		drawShapes();
 	} else {
-		// Display welcome text and instructions
-		fill(200);
-		textSize(width / 50);
-		textAlign(CENTER, CENTER);
-		textFont("Comfortaa");
-		text("Click anywhere to start...", width / 2, height / 2);
+		drawText();
 	}
 }
 
@@ -56,6 +44,27 @@ function drawGrid() {
 			}
 		}
 	})
+}
+
+function drawShapes() {
+	shapes.forEach(shape => {
+		shape.display();
+	})
+	if (currentShape && currentShape.nodes.length > 0 && currentShape.pending) {
+		let n = currentShape.nodes.length;
+		stroke(255, 0, 0);
+		line(currentShape.nodes[n-1].x, currentShape.nodes[n-1].y, currentNode.x, currentNode.y);
+		stroke(200);
+		ellipse(currentNode.x, currentNode.y, 10, 10);
+	}
+}
+
+function drawText() {
+	fill(200);
+	textSize(width / 50);
+	textAlign(CENTER, CENTER);
+	textFont("Comfortaa");
+	text("Click anywhere to start...", width / 2, height / 2);
 }
 
 function mousePressed() {
@@ -86,10 +95,10 @@ function mouseReleased() {
 	if (sessionStarted && currentShape) {
 		checkPosition();
 		if (currentNode.isAllowed) {
-			currentNode.init();
+			currentNode.init(pitchAxis);
 			currentShape.add(currentNode);
 			if (!shapeOpen) {
-				currentShape.init();
+				currentShape.init(SPEED);
 				shapes.push(currentShape);
 				shapeOpen = true;
 			}
