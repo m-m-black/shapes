@@ -60,6 +60,7 @@ function drawShapes() {
 }
 
 function drawText() {
+	noStroke();
 	fill(200);
 	textSize(width / 50);
 	textAlign(CENTER, CENTER);
