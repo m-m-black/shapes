@@ -64,7 +64,16 @@ function drawText() {
 	textSize(width / 50);
 	textAlign(CENTER, CENTER);
 	textFont("Comfortaa");
-	text("Click anywhere to start...", width / 2, height / 2);
+	let instructions1 = "HOW TO PLAY:\n"
+			+ "1. Turn your sound on\n"
+			+ "2. Click to draw a node\n"
+			+ "3. Draw multiple nodes to form a shape\n"
+			+ "4. Click back on the first node to form a closed loop\n";
+	let instructions2 = "A shape must form a loop before a new shape can be made\n"
+			+ "(click and drag towards the first node of a shape and it will lock in place)";
+	text(instructions1, width / 2, height * (1 / 3));
+	text(instructions2, width / 2, height / 2);
+	text("Click anywhere to start...", width / 2, height * (2 / 3));
 }
 
 function mousePressed() {
